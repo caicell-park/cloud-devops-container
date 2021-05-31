@@ -1,0 +1,42 @@
+1. [View logs for a container or service](https://docs.docker.com/config/containers/logging/)
+
+By default, `docker logs` shows the command’s STDOUT and STDERR. To read more about I/O and Linux, see the Linux Documentation Project article on I/O redirection.
+
+In some cases, docker logs may not show useful information unless you take additional steps.
+
+- If you use a logging driver which sends logs to a file, an external host, a database, or another logging back-end, and have “dual logging” disabled, docker logs may not show useful information.
+- If your image runs a non-interactive process such as a web server or a database, that application may send its output to log files instead of STDOUT and STDERR.
+
+In the first case, your logs are processed in other ways and you may choose not to use docker logs. In the second case, the official nginx image shows one workaround, and the official Apache httpd image shows another.
+
+The official nginx image creates a symbolic link from /var/log/nginx/access.log to /dev/stdout, and creates another symbolic link from /var/log/nginx/error.log to /dev/stderr, overwriting the log files and causing logs to be sent to the relevant special device instead. See the Dockerfile.
+
+The official httpd driver changes the httpd application’s configuration to write its normal output directly to /proc/self/fd/1 (which is STDOUT) and its errors to /proc/self/fd/2 (which is STDERR). See the Dockerfile.
+
+[Reference]
+1. [What is /dev/stduout by comparing stdout?](https://stackoverflow.com/questions/30780780/difference-between-stdout-and-dev-stdout)
+
+2. [Configure Logging drivers](https://docs.docker.com/config/containers/logging/configure/) for a Docker Container?
+
+You can configure logging for a Docker container by selecting the type of log driver, in this example json-file, and whether it is blocking or non-blocking. This example shows a configuration that uses json-file and mode=non-blocking for an Ubuntu container. The non-blocking mode ensures that the application won't fail in a non-deterministic manner. Make sure to read the Docker logging guide on different logging options.
+
+```sh
+>  /tmp docker run -it --log-driver json-file --log-opt mode=non-blocking ubuntu 
+root@551f89012f30:/#
+```
+
+If the logging driver has configurable options, you can set them in the daemon.json file as a JSON object with the key log-opts. The following example sets two configurable options on the json-file logging driver:
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3",
+    "labels": "production_status",
+    "env": "os,customer"
+  }
+}
+```
+
+![Available Logging Driver](../images/docker-available-logging-driver.png)

@@ -1,0 +1,15 @@
+What Goes in a Dockerfile if You Need to Write to the Host Filesystem?
+In the following example the docker volume command is used to create a volume and then later it is mounted to the container.
+
+```sh
+>  /tmp docker volume create docker-data
+docker-data
+>  /tmp docker volume ls
+DRIVER              VOLUME NAME
+local               docker-data
+>  /tmp docker run -d \
+  --name devtest \
+  --mount source=docker-data,target=/app \
+  ubuntu:latest
+6cef681d9d3b06788d0f461665919b3bf2d32e6c6cc62e2dbab02b05e77769f4
+```

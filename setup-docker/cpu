@@ -1,0 +1,9 @@
+What about Configuring Memory, CPU and GPU?
+
+You can configure docker run to accept flags for setting Memory, CPU and GPU. You can read more about it here in the official documentation. Here is a brief example of setting the CPU.
+
+```sh
+docker run -it --cpus=".25" ubuntu /bin/bash
+```
+
+This tells this container to use at max only 25% of the CPU every second.
